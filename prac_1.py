@@ -12,15 +12,37 @@ Date: <23/07/2019>
 import RPi.GPIO as GPIO
 import time
 
-# Logic that you write
+def my_callback_one(channel):
+    count_up
+
+def my_callback_two(channel):
+    print('Callback two')
+
+GPIO.add_event_detect(channel, GPIO.RISING)
+GPIO.add_event_callback(channel, my_callback_one)
+GPIO.add_event_callback(channel, my_callback_two)
+
+counter = 0
+
+def count_up:
+    counter += 1%8
+    GPIO.output(11, counter & 0x01)
+    GPIO.output(13, counter & 0x02)
+    GPIO.output(15, counter & 0x04)
+    
+def count_down:
+    counter -= 1%8
+    GPIO.output(11, counter & 0x01)
+    GPIO.output(13, counter & 0x02)
+    GPIO.output(15, counter & 0x04)
+    
 def main():    
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BOARD)
 
-    counter =0
-    current_num = ""
-    LED_pins = [3,5,7]
-    button_pins = [8,10]
+    
+    LED_pins = [11,13,15]
+    button_pins = [16,18]
 
     for i in range(len(LED_pins)):
         GPIO.setup(LED_pins[i],GPIO.OUT)
@@ -28,14 +50,6 @@ def main():
     for i in range(len(button_pins)):
         GPIO.setup(button_pins[i],GPIO.IN)
         
-    
-    while True:
-        GPIO.output(3, counter & 0x01)
-        GPIO.output(5, counter & 0x02)
-        GPIO.output(7, counter & 0x04)
-        time.sleep(0.5)
-        counter += 1%8
-    
         
 # Only run the functions if 
 if __name__ == "__main__":
