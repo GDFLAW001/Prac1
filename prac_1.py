@@ -12,46 +12,51 @@ Date: <23/07/2019>
 import RPi.GPIO as GPIO
 import time
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
+#sets up GPIO
+def setup():
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BOARD)
+    
+    LED_pins = [11,13,15]
+    button_pins = [16,18]
 
+    #loop to set up all pins in arrays
+    for i in range(len(LED_pins)):
+        GPIO.setup(LED_pins[i],GPIO.OUT)
+
+    for i in range(len(button_pins)):
+        GPIO.setup(button_pins[i],GPIO.IN)        
+
+    #set up event detect on push buttons for rising edge wih bouncetime 
+    GPIO.add_event_detect(16, GPIO.RISING, callback=count_down_callback, bouncetime=250)
+    GPIO.add_event_detect(18, GPIO.RISING, callback=count_up_callback, bouncetime=250)
+
+setup()
+
+#counter keeps track of binary 
 counter = 0
 
-def my_callback_one(channel):
+# callback function when left button is pressed
+#increases counter and sets LEDs to new counter value
+def count_up_callback(channel):
     global counter
     counter += 1%8
-    count_up(counter)
-
-def my_callback_two(channel):
-    global counter
-    counter -= 1%8
-    count_down(counter)
-
-LED_pins = [11,13,15]
-button_pins = [16,18]
-
-for i in range(len(LED_pins)):
-    GPIO.setup(LED_pins[i],GPIO.OUT)
-
-for i in range(len(button_pins)):
-    GPIO.setup(button_pins[i],GPIO.IN)        
-
-GPIO.add_event_detect(16,GPIO.RISING,callback=my_callback_two,bouncetime=250)
-GPIO.add_event_detect(18,GPIO.RISING,callback=my_callback_one,bouncetime=250)
-
-def main():    
-    time.sleep(0.1)    
-        
-def count_up(counter):
     GPIO.output(11, counter & 0x01)
     GPIO.output(13, counter & 0x02)
     GPIO.output(15, counter & 0x04)
     
-def count_down(counter):
+#callback function for when right button is pressed
+#decreases counter and sets LEDs to new counter value
+def count_down_callback(channel):
+    global counter
+    counter -= 1%8
     GPIO.output(11, counter & 0x01)
     GPIO.output(13, counter & 0x02)
     GPIO.output(15, counter & 0x04)
-        
+    
+def main():    
+    time.sleep(0.1)    
+           
 # Only run the functions if 
 if __name__ == "__main__":
     # Make sure the GPIO is stopped correctly
